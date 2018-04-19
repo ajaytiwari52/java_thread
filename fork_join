@@ -1,0 +1,82 @@
+package thread;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.RecursiveTask;
+import java.util.logging.Logger;
+
+public class ForkJoinMain {
+  public static void main(String[] args) {
+    ForkJoinPool commonPool = ForkJoinPool.commonPool();
+    commonPool.invoke(
+        new CustomRecursiveAction("THis is  sdfsdf dsfnsf sdfnsdkf sdfondsf dsofjndsf dskf"));
+  }
+}
+
+class CustomRecursiveAction extends RecursiveAction {
+  private static final int THRESOLD = 4;
+  private static Logger logger = Logger.getAnonymousLogger();
+  private String workload = "";
+
+  CustomRecursiveAction(String workload) {
+    this.workload = workload;
+  }
+
+  @Override
+  protected void compute() {
+    if (workload.length() > THRESOLD) {
+      ForkJoinTask.invokeAll(createSubtasks());
+    } else {
+      processing(workload);
+    }
+  }
+
+  private List<CustomRecursiveAction> createSubtasks() {
+    List<CustomRecursiveAction> subtasks = new ArrayList<>();
+    String partOne = workload.substring(0, workload.length() / 2);
+    String partTwo = workload.substring(workload.length() / 2, workload.length());
+    subtasks.add(new CustomRecursiveAction(partOne));
+    subtasks.add(new CustomRecursiveAction(partTwo));
+    return subtasks;
+  }
+
+  private void processing(String work) {
+    String result = work.toUpperCase();
+    logger.info(
+        "This result - " + result + " was processed by " + Thread.currentThread().getName());
+  }
+}
+
+class CustomRecursiveTask extends RecursiveTask<Integer> {
+  private static final int THRESHOLD = 20;
+  private int[] arr;
+
+  public CustomRecursiveTask(int[] arr) {
+    this.arr = arr;
+  }
+
+  @Override
+  protected Integer compute() {
+    if (arr.length > THRESHOLD) {
+      return ForkJoinTask.invokeAll(createSubtasks()).stream().mapToInt(ForkJoinTask::join).sum();
+    } else {
+      return processing(arr);
+    }
+  }
+
+  private Collection<CustomRecursiveTask> createSubtasks() {
+    List<CustomRecursiveTask> dividedTasks = new ArrayList<>();
+    dividedTasks.add(new CustomRecursiveTask(Arrays.copyOfRange(arr, 0, arr.length / 2)));
+    dividedTasks.add(new CustomRecursiveTask(Arrays.copyOfRange(arr, arr.length / 2, arr.length)));
+    return dividedTasks;
+  }
+
+  private Integer processing(int[] arr) {
+    return Arrays.stream(arr).filter(a -> a > 10 && a < 27).map(a -> a * 10).sum();
+  }
+}

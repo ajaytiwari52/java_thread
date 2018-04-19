@@ -1,0 +1,53 @@
+````
+package thread;
+
+class FirstResource implements Runnable {
+
+    @Override
+    public void run() {
+        synchronized (String.class){
+            System.out.println(Thread.currentThread().getName() + " Thread entered in first resource");
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println(Thread.currentThread().getName() + " is waiting for object class ");
+            synchronized (Object.class){
+
+            }
+            System.out.println("Thread executed successfully "+ Thread.currentThread().getName());
+        }
+
+    }
+}
+
+class SecondResource implements Runnable{
+    public void run(){
+        synchronized (Object.class){
+            System.out.println(Thread.currentThread().getName() + " Thread entered in second resource");
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println(Thread.currentThread().getName()+ " is waiting for String class ");
+            synchronized (String.class){
+                System.out.println("Thread executed sucessfully"+ Thread.currentThread().getName());
+            }
+        }
+    }
+}
+
+
+public class DeadLock {
+    public static void main(String[] args){
+        Thread t1 = new Thread(new FirstResource(), "Thread 1");
+        Thread t2 = new Thread(new SecondResource(), "Thread 2");
+
+        t1.start();
+        t2.start();
+    }
+}
+
+````

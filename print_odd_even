@@ -1,0 +1,67 @@
+````
+package thread;
+
+public class PrintOddEven implements Runnable {
+  private int max;
+  private int number;
+
+  public PrintOddEven(int max_number, int number) {
+    max = max_number;
+    this.number = number;
+  }
+
+  public static void main(String[] args) {
+    PrintOddEven printer = new PrintOddEven(10, 1);
+    Thread thread1 = new Thread(printer, "odd");
+    Thread thread2 = new Thread(printer, "even");
+
+    thread1.start();
+    thread2.start();
+  }
+
+  @Override
+  public void run() {
+
+    while (number < max) {
+      if (Thread.currentThread().getName().equalsIgnoreCase("odd")) {
+        try {
+          printOdd();
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      } else {
+        try {
+          printEven();
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+  }
+
+  public synchronized void printOdd() throws InterruptedException {
+
+    if (number % 2 == 0) {
+      wait();
+    }
+
+    System.out.println(number + Thread.currentThread().getName());
+    number++;
+    notify();
+  }
+
+  public synchronized void printEven() throws InterruptedException {
+
+    if (number % 2 != 0) {
+      wait();
+    }
+
+    System.out.println(number + Thread.currentThread().getName());
+    number++;
+    notify();
+  }
+}
+
+
+
+````

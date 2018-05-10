@@ -1,33 +1,34 @@
 ````
-class TicketBookingSystem implements Runnable {
-    int availableTickets = 1;
+package thread;
 
-    public void run() {
-        synchronized (this) {
-            if (this.availableTickets > 0) {
-                System.out.println("Ticket booking started by " + Thread.currentThread().getName());
-                try {
-                    Thread.sleep(1000);
-                    availableTickets--;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                System.out.println("Ticket booked by " + Thread.currentThread().getName());
-                System.out.println("Available tickets: " + this.availableTickets);
-            }
-        }
+class TicketBookingSystem implements Runnable {
+  int availableTickets = 1;
+
+  public void run() {
+    if (this.availableTickets > 0) {
+      System.out.println("Ticket booking started by " + Thread.currentThread().getName());
+      try {
+        Thread.sleep(1000);
+        availableTickets--;
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      System.out.println("Ticket booked by " + Thread.currentThread().getName());
+      System.out.println("Available tickets: " + this.availableTickets);
     }
+  }
 }
 
 public class TheadStarvation {
-    public static void main(String[] args) {
-        TicketBookingSystem ticketBookingSystem = new TicketBookingSystem();
-        Thread t1 = new Thread(ticketBookingSystem, "Thread 1");
-        Thread t2 = new Thread(ticketBookingSystem, "Thread 2");
+  public static void main(String[] args) {
+    TicketBookingSystem ticketBookingSystem = new TicketBookingSystem();
+    Thread t1 = new Thread(ticketBookingSystem, "Thread 1");
+    Thread t2 = new Thread(ticketBookingSystem, "Thread 2");
 
-        t1.start();
-        t2.start();
-    }
+    t1.start();
+    t2.start();
+  }
 }
+
 
 ````
